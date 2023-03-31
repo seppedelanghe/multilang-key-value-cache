@@ -1,3 +1,4 @@
+import os
 import http.server
 
 from functools import partial
@@ -6,7 +7,7 @@ from kvc import Cache, HTTPHandler
 
 HOST = "127.0.0.1"
 PORT = 9800
-MAX_SIZE = 1000
+MAX_SIZE = int(os.environ.get('MKV_MAX_SIZE', '1000'))
 
 cache = Cache(MAX_SIZE)
 
