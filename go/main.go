@@ -31,61 +31,58 @@ func streamToByteArray(stream io.Reader) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
-func handleGet(w http.ResponseWriter, r *http.Request) {
-	uuid, err := getKey(r.URL.Path)
-	if err != nil {
-		fmt.Printf("Error in url: %s\n", err)
-		w.WriteHeader(404)
+func handleGet(w http.ResponseWriter, r *http.Request, uuid string) {
+	value, exists := cache[uuid]
+	if exists {
+		w.WriteHeader(200)
+		w.Write(value)
 	} else {
-		value, exists := cache[uuid]
-		if exists {
-			w.WriteHeader(200)
-			w.Write(value)
-		} else {
-			w.WriteHeader(404)
-		}
+		w.WriteHeader(404)
 	}
 }
 
-func handlePost(w http.ResponseWriter, r *http.Request) {
-	uuid, err := getKey(r.URL.Path)
-	if err != nil {
-		fmt.Printf("Error in url: %s\n", err)
-		w.WriteHeader(404)
+func handlePost(w http.ResponseWriter, r *http.Request, uuid string) {
+	buf, rerr := streamToByteArray(r.Body)
+	if rerr != nil {
+		w.WriteHeader(500)
 	} else {
-		buf, rerr := streamToByteArray(r.Body)
-		if rerr != nil {
-			w.WriteHeader(500)
-		} else {
-			cache[uuid] = buf
-			w.WriteHeader(201)
-		}
+		cache[uuid] = buf
+		w.WriteHeader(201)
 	}
 }
 
-func handleDelete(w http.ResponseWriter, r *http.Request) {
+func handleDelete(w http.ResponseWriter, r *http.Request, uuid string) {
+	_, exists := cache[uuid]
+	if exists {
+		delete(cache, uuid)
+		w.WriteHeader(200)
+	} else {
+		w.WriteHeader(404)
+	}
+}
+
+func validatePath(r *http.Request) (string, bool) {
 	uuid, err := getKey(r.URL.Path)
 	if err != nil {
 		fmt.Printf("Error in url: %s\n", err)
-		w.WriteHeader(404)
-	} else {
-		_, exists := cache[uuid]
-		if exists {
-			delete(cache, uuid)
-			w.WriteHeader(200)
-		} else {
-			w.WriteHeader(404)
-		}
+		return "", false
 	}
+	return uuid, true
 }
 
 func handle(w http.ResponseWriter, r *http.Request) {
+	uuid, ok := validatePath(r)
+	if !ok {
+		w.WriteHeader(404)
+		return
+	}
+
 	if r.Method == "GET" {
-		handleGet(w, r)
+		handleGet(w, r, uuid)
 	} else if r.Method == "POST" {
-		handlePost(w, r)
+		handlePost(w, r, uuid)
 	} else if r.Method == "DELETE" {
-		handleDelete(w, r)
+		handleDelete(w, r, uuid)
 	} else {
 		w.WriteHeader(405)
 		r.Body.Close()
