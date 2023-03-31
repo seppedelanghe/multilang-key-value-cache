@@ -17,7 +17,7 @@ class Cache:
         if len(self.table) == self.max_size:
             if not self.kick:
                 return False
-            del self.table[list(self.table)[-1]] # kick last item
+            del self.table[list(self.table)[0]] # kick first added items
         self.table[key] = value
         return True
     
