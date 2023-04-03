@@ -6,26 +6,34 @@ Just trying out the same small project in different languages using as little to
 
 __configuration:__
 
-- HOST
 - PORT
 - MAX_SIZE => max cache size
+- KICK => Kick items if cache full and you want to add another
 
 __Starting server:__
 ```sh
 # python
-python3 main.py
+python3 python3/main.py
+
+# GO
+go run go/main.go
 ```
 
 __Routes:__
 
 `/{key}`
 - GET
-    - get value for key if exists
+    - get value for key if it exists
 - POST
-    - set value for key if it doesn't exist
+    - set a value for a key
+- DELETE
+    - delete the key from the cache
 
 
+# Progress
 
+- __Python3:__ 100%
+- __GO:__ 90%
 
 # Performace
 
@@ -34,3 +42,6 @@ __Routes:__
 ## Python 3.10
 
 ## Python 3.11
+
+
+## GO
