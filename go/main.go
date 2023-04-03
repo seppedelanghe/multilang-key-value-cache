@@ -11,7 +11,8 @@ import (
 )
 
 var port = "9800"
-var cache = make(map[string][]byte)
+var max_size = 10000
+var cache = make(map[string][]byte, max_size)
 
 func getKey(url string) (string, error) {
 	s := strings.Split(url, "/")
@@ -41,6 +42,7 @@ func handleGet(w http.ResponseWriter, r *http.Request, uuid string) {
 	}
 }
 
+// TODO: check if full and kick or 404
 func handlePost(w http.ResponseWriter, r *http.Request, uuid string) {
 	buf, rerr := streamToByteArray(r.Body)
 	if rerr != nil {
