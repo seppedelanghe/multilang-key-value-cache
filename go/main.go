@@ -31,6 +31,13 @@ func getKey(url string) (string, error) {
 	return s[1], nil
 }
 
+func getRandomKey() string {
+	for k := range cache {
+		return k
+	}
+	return ""
+}
+
 func _verify(key string) string {
 	data := cache[key]
 	h := sha1.New()
@@ -57,12 +64,16 @@ func handleGet(w http.ResponseWriter, r *http.Request, uuid string) {
 	}
 }
 
-// TODO: check if full and kick or 404
 func handlePost(w http.ResponseWriter, r *http.Request, uuid string) {
 	buf, rerr := streamToByteArray(r.Body)
 	if rerr != nil {
 		w.WriteHeader(500)
 	} else {
+		if len(cache) >= max_size {
+			rankey := getRandomKey()
+			delete(cache, rankey)
+		}
+
 		cache[uuid] = buf
 		payload := Payload{
 			Hash: _verify(uuid),
