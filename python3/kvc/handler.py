@@ -60,9 +60,13 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         
         body = self._get_body()
 
-        ok = self.cache.set(key, body)
+        ok, hexdigest = self.cache.set(key, body)
         if ok:
             self._send_headers(201)
+            if self.cache.verify:
+                self._write_dict({
+                    'hash': hexdigest
+                })
             self.wfile.flush()
             return
         
