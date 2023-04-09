@@ -2,6 +2,9 @@ package main
 
 import (
 	"bytes"
+	"crypto/sha1"
+	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -13,6 +16,11 @@ import (
 var port = "9800"
 var max_size = 10000
 var cache = make(map[string][]byte, max_size)
+var verify = true
+
+type Payload struct {
+	Hash string
+}
 
 func getKey(url string) (string, error) {
 	s := strings.Split(url, "/")
@@ -21,6 +29,13 @@ func getKey(url string) (string, error) {
 	}
 
 	return s[1], nil
+}
+
+func _verify(key string) string {
+	data := cache[key]
+	h := sha1.New()
+	h.Write(data)
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func streamToByteArray(stream io.Reader) ([]byte, error) {
@@ -49,7 +64,14 @@ func handlePost(w http.ResponseWriter, r *http.Request, uuid string) {
 		w.WriteHeader(500)
 	} else {
 		cache[uuid] = buf
-		w.WriteHeader(201)
+		payload := Payload{
+			Hash: _verify(uuid),
+		}
+		if verify {
+			json.NewEncoder(w).Encode(payload)
+		} else {
+			w.WriteHeader(201)
+		}
 	}
 }
 
