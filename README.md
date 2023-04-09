@@ -9,6 +9,7 @@ __configuration:__
 - PORT
 - MAX_SIZE => max cache size
 - KICK => Kick items if cache full and you want to add another
+- VERIFY => Calculate hashes of body to allow for verification
 
 __Starting server:__
 ```sh
@@ -33,7 +34,7 @@ __Routes:__
 # Progress
 
 - __Python3:__ 100%
-- __GO:__ 90%
+- __GO:__ 100%
 
 # Performace
 
@@ -42,6 +43,5 @@ __Routes:__
 ## Python 3.10
 
 ## Python 3.11
-
 
 ## GO
