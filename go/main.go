@@ -11,12 +11,35 @@ import (
 	"net/http"
 	"os"
 	"strings"
+  "strconv"
 )
 
-var port = "9800"
-var max_size = 10000
+func getEnv(key, fallback string) string {
+  if value, ok := os.LookupEnv(key); ok {
+    return value
+  }
+  return fallback
+}
+
+func getEnvVars() (string, int, bool) {
+  port_str := getEnv("MKV_PORT", "9800")
+  max_size_str := getEnv("MKV_MAX_SIZE", "10000")
+  max_size, err := strconv.Atoi(max_size_str)
+  if err != nil {
+    fmt.Printf("Could not convert value of %s set as MAX_SIZE to interger", err)
+  }
+
+  verify_str := getEnv("MKV_VERIFY", "false")
+  verify := false
+  if strings.ToLower(verify_str) == "true" {
+    verify = true
+  }
+
+  return port_str, max_size, verify
+}
+
+var port, max_size, verify = getEnvVars()
 var cache = make(map[string][]byte, max_size)
-var verify = true
 
 type Payload struct {
 	Hash string
