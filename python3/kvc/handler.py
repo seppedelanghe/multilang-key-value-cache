@@ -29,7 +29,8 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
 
     def _get_body(self) -> bytes:
-        l = int(self.headers.get('Content-Length'))
+        content_length = self.headers.get('Content-Length', None) or 0
+        l = int(content_length)
         return self.rfile.read(l)
 
     def do_HEAD(self):
