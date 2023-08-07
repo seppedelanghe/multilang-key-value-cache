@@ -10,6 +10,7 @@ __configuration:__
 - MAX_SIZE => max cache size
 - KICK => Kick items if cache full and you want to add another
 - VERIFY => Calculate hashes of body to allow for verification
+- MAX_MEMORY => Max memory to use, float percentage (0.9) or int in bytes (Python only)
 
 __Starting server:__
 ```sh

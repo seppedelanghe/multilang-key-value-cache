@@ -38,7 +38,9 @@ class Cache:
                 return False, ''
             del self.table[list(self.table)[0]] # kick first added items
         if self._oof():
-            return False, ''
+            if not self.kick:
+                return False, ''
+            del self.table[list(self.table)[0]] # kick first added items
 
         self.table[key] = value
         return True, self._verify(key) if self.verify else ''
