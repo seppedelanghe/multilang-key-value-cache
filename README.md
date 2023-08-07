@@ -32,17 +32,26 @@ __Routes:__
     - delete the key from the cache
 
 
-# Progress
+# Todo
 
 - __Python3:__ 100%
-- __GO:__ 100%
+- __GO:__ 
+    - Max memory
 
-# Performace
+# Docker
+Run in a docker container.
 
-## Python 3.9
 
-## Python 3.10
+### Python
+```bash
+cd python3
+docker build -t mkv:python3 . 
+docker run -p 9800:9800 -t mkv:python3
+```
 
-## Python 3.11
-
-## GO
+### Go
+```bash
+cd go
+docker build -t mkv:go .
+docker run -p 9800:9800 -t mkv:go
+```
