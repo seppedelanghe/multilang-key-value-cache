@@ -41,7 +41,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         if not key:
             return
 
-        value = self.cache.get(key)
+        value = self.cache[key]
         if not value:
             self._send_headers(404)
             self._write_dict({
