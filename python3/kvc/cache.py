@@ -1,4 +1,8 @@
-import psutil
+try:
+    import psutil
+    PSUTIL = True
+except ImportError:
+    PSUTIL = False
 import hashlib
 from typing import Optional, Dict, Tuple, Union
 
@@ -15,6 +19,8 @@ class Cache:
 
     def _oof(self) -> bool:
         """returns true if Out Of Memory based on max_memory_usage"""
+        if not PSUTIL:
+            return False
         mem = psutil.virtual_memory()
         if isinstance(self.max_memory_usage, float) and self.max_memory_usage < 1:
             return mem.percent / 100 >= self.max_memory_usage
