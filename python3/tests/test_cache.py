@@ -128,4 +128,34 @@ class TestCache(TestCase):
         self.assertIsNotNone(self.c.get('any'))
         self.assertIsNone(self.c.get('0'))
 
+    def test_returned_value_is_correct(self) -> None:
+        size = 10
         
+        for i in range(size):
+            self.c.set(str(i), str(i).encode())
+
+        for i in range(size):
+            out = self.c.get(str(i))
+            self.assertEqual(str(i).encode(), out)
+
+    def test_items_get_kicked_in_correct_order(self) -> None:
+        max_size = 3
+        keys = [f"key_{i}" for i in range(10)]
+
+        self.c.config.max_size = max_size
+        self.c.config.kick = True
+       
+        for idx, key in enumerate(keys):
+            self.c.set(key, key.encode())
+            if idx >= max_size:
+                self.assertEqual(len(self.c), max_size)
+                for j in range(idx - max_size):
+                    self.assertIsNone(self.c.get(keys[j]))
+            else:
+                self.assertLessEqual(len(self.c), max_size)
+
+            lower = idx + 1 - max_size if idx - max_size >= 0 else 0
+            for ij in range(lower, idx):
+                self.assertIsNotNone(self.c.get(keys[ij]))
+
+
