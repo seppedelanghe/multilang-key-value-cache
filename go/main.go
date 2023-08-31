@@ -92,6 +92,12 @@ func handlePost(w http.ResponseWriter, r *http.Request, uuid string) {
 	if rerr != nil {
 		w.WriteHeader(500)
 	} else {
+    if len(buf) == 0 {
+
+      w.WriteHeader(422)
+      return
+    }
+
 		if len(cache) >= max_size {
 			rankey := getRandomKey()
 			delete(cache, rankey)
