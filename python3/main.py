@@ -10,7 +10,7 @@ config = KVCConfig.from_env()
 cache = Cache(config)
 
 def listen():
-    handler = partial(HTTPHandler, cache)
+    handler = partial(HTTPHandler, cache, config)
     webServer = http.server.HTTPServer((config.host, config.port), handler)
     print(f"Server started at: {config.url}")
 
