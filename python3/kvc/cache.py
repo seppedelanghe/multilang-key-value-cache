@@ -14,7 +14,10 @@ class Cache:
         self.table: Dict[str, bytes] = {}
         self.config = config
 
-    def _oof(self) -> bool:
+    def __len__(self) -> int:
+        return len(self.table.keys())
+
+    def _oom(self) -> bool:
         """returns true if Out Of Memory based on max_memory_usage"""
         if not PSUTIL:
             return False
@@ -41,15 +44,15 @@ class Cache:
         """tries sets the value for the key and returns if it succeeded and optionally it's hash"""
         if len(self.table) == self.config.max_size:
             if not self.config.kick:
-                return False, ''
+                return False, None
             del self.table[list(self.table)[0]] # kick first added items
-        if self._oof():
+        if self._oom():
             if not self.config.kick:
-                return False, ''
+                return False, None
             del self.table[list(self.table)[0]] # kick first added items
 
         self.table[key] = value
-        return True, self._verify(key) if self.config.verify else ''
+        return True, self._verify(key) if self.config.verify else None
     
     def drop(self, key: str) -> bool:
         if key not in self.table:

@@ -5,13 +5,13 @@ from typing import Union, Optional
 class KVCConfig:
     def __init__(
             self,
-            host: str,
-            port: int,
-            max_size: int,
-            max_memory_usage: Optional[Union[int, float]],
-            kick: bool,
-            verify: bool,
-            allow_empty_body: bool) -> None:
+            host: str = 'http://127.0.0.1',
+            port: int = 9800,
+            max_size: int = 10_000,
+            max_memory_usage: Optional[Union[int, float]] = 0.9,
+            kick: bool = True,
+            verify: bool = False,
+            allow_empty_body: bool = True) -> None:
         
         self.host = host
         self.port = port

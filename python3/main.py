@@ -1,4 +1,3 @@
-import os
 import http.server
 
 from functools import partial
