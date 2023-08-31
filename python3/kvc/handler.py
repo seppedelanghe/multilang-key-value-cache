@@ -1,11 +1,14 @@
 import json
 import http.server
 
+from .config import KVCConfig
+
 from .cache import Cache
 
 class HTTPHandler(http.server.BaseHTTPRequestHandler):
-    def __init__(self, cache: Cache, *args, **kwargs):
+    def __init__(self, cache: Cache, config: KVCConfig, *args, **kwargs):
         self.cache = cache
+        self.config = config
         super().__init__(*args, **kwargs)
 
     def _send_headers(self, code: int = 200):
@@ -42,7 +45,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
             return
 
         value = self.cache[key]
-        if not value:
+        if value is None:
             self._send_headers(404)
             self._write_dict({
                 'message': 'Key not found!'
@@ -60,7 +63,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
             return
         
         body = self._get_body()
-        if len(body) == 0:
+        if not self.config.allow_empty_body and len(body) == 0:
             self._send_headers(422)
             self._write_dict({
                 'message': 'Body is empty, cannot set empty body!'
@@ -71,7 +74,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         ok, hexdigest = self.cache.set(key, body)
         if ok:
             self._send_headers(201)
-            if self.cache.verify:
+            if isinstance(hexdigest, str):
                 self._write_dict({
                     'hash': hexdigest
                 })
