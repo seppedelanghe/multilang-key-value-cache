@@ -29,7 +29,7 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
         self.wfile.write(json.dumps(data).encode('utf-8'))
 
     def _get_body(self) -> bytes:
-        content_length = self.headers.get('Content-Length', None) or 0
+        content_length = self.headers.get('Content-Length', '0')
         l = int(content_length)
         return self.rfile.read(l)
 
@@ -60,6 +60,13 @@ class HTTPHandler(http.server.BaseHTTPRequestHandler):
             return
         
         body = self._get_body()
+        if len(body) == 0:
+            self._send_headers(422)
+            self._write_dict({
+                'message': 'Body is empty, cannot set empty body!'
+            })
+            self.wfile.flush()
+            return
 
         ok, hexdigest = self.cache.set(key, body)
         if ok:
